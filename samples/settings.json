@@ -1,0 +1,18 @@
+{
+  "accounts": {
+    "bitstamp": {
+      "api": {
+        "uid": "",
+        "apiKey": "",
+        "secret": ""
+      }
+    },
+    "cex": {
+      "api": {
+        "uid": "",
+        "apiKey": "",
+        "secret": ""
+      }
+    }
+  }
+}

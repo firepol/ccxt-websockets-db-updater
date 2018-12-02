@@ -1,0 +1,16 @@
+{
+  "limit": 5,
+  "subscriptions": {
+    "bitfinex": [
+      "BTC/USDT",
+      "ETH/USDT"
+    ],
+    "binance": [
+      "BNB/BTC"
+    ],
+    "bitstamp": [
+      "BTC/EUR",
+      "BTC/USD"
+    ]
+  }
+}
