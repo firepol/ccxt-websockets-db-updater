@@ -1,1 +1,1 @@
-git+git://github.com/firepol/ccxt@websockets-multiple#egg=ccxt&subdirectory=python
+git+git://github.com/firepol/ccxt-websockets#egg=ccxt&subdirectory=python

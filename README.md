@@ -2,7 +2,10 @@
 
 A Python 3 command line program to subscribe cryptocurrency exchanges websockets and save order books in real time in a database.
 
-This project is based on [CCXT lfern/websockets-multiple fork](https://github.com/lfern/ccxt/tree/feature/websockets-multiple).  
+This project is based on [CCXT lfern/websockets-multiple fork](https://github.com/lfern/ccxt/tree/feature/websockets-multiple).
+
+To speed up installation, as the CCXT repository is huge and takes a long time to download, I created a repository containing just the transpiled files from lfern's branch. When the branch will be forked in the [official CCXT project](https://github.com/ccxt/ccxt), this temporary branch won't be needed anymore.
+
 Credits for the websockets implementations: **lfern** and his collaborators.
 
 If you are looking for a java alternative, check my other similar project: [Cryptows](https://github.com/firepol/crypto-websockets).
@@ -37,6 +40,13 @@ source ~/env/ccxtws/bin/activate
 ```
 
 ## Quick start
+
+**Note**: the python commands may not work for you, if you type them like an executable file, especially if you are on Windows. In that case prefix the command with `python`, like this:
+
+```
+python script_name.py
+```
+
 
 Inside the repo, you can run this command to get an overview of all the command line parameters:
 
