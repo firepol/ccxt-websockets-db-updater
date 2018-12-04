@@ -4,7 +4,8 @@ A Python 3 command line program to subscribe cryptocurrency exchanges websockets
 
 This project is based on [CCXT lfern/websockets-multiple fork](https://github.com/lfern/ccxt/tree/feature/websockets-multiple).
 
-To speed up installation, as the CCXT repository is huge and takes a long time to download, I created a repository containing just the transpiled files from lfern's branch. When the branch will be forked in the [official CCXT project](https://github.com/ccxt/ccxt), this temporary branch won't be needed anymore.
+To speed up installation, as the CCXT repository is huge and takes a long time to download, I created a repository containing just the transpiled files from lfern's branch: https://github.com/firepol/ccxt-websockets
+When the branch will be forked in the [official CCXT project](https://github.com/ccxt/ccxt), this temporary branch won't be needed anymore.
 
 Credits for the websockets implementations: **lfern** and his collaborators.
 
@@ -37,6 +38,20 @@ Then run:
 
 ```
 source ~/env/ccxtws/bin/activate
+```
+
+## Update
+
+To get the latest updates from https://github.com/firepol/ccxt-websockets, first unintall CCXT as follows:
+
+```
+pip uninstall ccxt
+```
+
+Get the latest version linked in the requirements.txt:
+
+```
+pip install -r requirements
 ```
 
 ## Quick start
