@@ -37,7 +37,7 @@ def get_ccxt_exchange(exchange_name, settings, **kwargs):
         logging.warning(f'Exchange {exchange_name} not supported, ignoring...')
 
 
-async def subscribe_ws(event, exchange, symbol, limit, loop, pp, debug=False, verbose=False):
+async def subscribe_ws(event, exchange, symbols, limit, loop, pp, debug=False, verbose=False):
     @exchange.on('err')
     def websocket_error(err, conxid):  # pylint: disable=W0612
         print(type(err).__name__ + ":" + str(err))
@@ -55,5 +55,6 @@ async def subscribe_ws(event, exchange, symbol, limit, loop, pp, debug=False, ve
 
     sys.stdout.flush()
 
-    await exchange.websocket_subscribe(event, symbol, {'limit': limit})
-    print(f'subscribed: {exchange.id} {symbol}')
+    for symbol in symbols:
+        await exchange.websocket_subscribe(event, symbol, {'limit': limit})
+        print(f'subscribed: {exchange.id} {symbol}')

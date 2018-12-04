@@ -6,7 +6,8 @@
       "ETH/USDT"
     ],
     "binance": [
-      "BNB/BTC"
+      "BNB/BTC",
+      "NANO/BTC"
     ],
     "bitstamp": [
       "BTC/EUR",

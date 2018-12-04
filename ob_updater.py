@@ -27,9 +27,8 @@ def main():
             settings = utils.get_exchange_settings(exchange_name)
             exchange = utils.get_ccxt_exchange(exchange_name, settings)
 
-            for symbol in symbols:
-                asyncio.ensure_future(utils.subscribe_ws('ob', exchange, symbol, limit,
-                                                         loop, pp, args.debug, args.verbose))
+            asyncio.ensure_future(utils.subscribe_ws('ob', exchange, symbols, limit,
+                                                     loop, pp, args.debug, args.verbose))
 
         loop.run_forever()
 
