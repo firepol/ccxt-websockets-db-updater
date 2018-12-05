@@ -2,10 +2,12 @@
 # coding=utf-8
 
 import argparse
-import json
-import pprint
 import asyncio
+import pprint
+import configparser
+
 import utils
+from db_model import get_db_session
 
 
 def main():
@@ -17,18 +19,28 @@ def main():
     pp = pprint.PrettyPrinter(depth=6)
     loop = asyncio.get_event_loop()
 
-    settings_ws = json.load(open('./data/settings_ws.json'))
-    subscriptions = settings_ws['subscriptions']
-    limit = settings_ws['limit']
+    settings = configparser.ConfigParser()
+    settings.read('./data/settings.ini')
+
+    limit = int(settings['config']['order_book_entries_limit'])
+
+    session = get_db_session()
 
     try:
-        for exchange_name, symbols in subscriptions.items():
+        sections_to_ignore = ['config']
+        for exchange_name in settings.sections():
+            if exchange_name in sections_to_ignore:
+                continue
 
-            settings = utils.get_exchange_settings(exchange_name)
-            exchange = utils.get_ccxt_exchange(exchange_name, settings)
+            symbols = settings[exchange_name].get('symbols')
+            if symbols:
+                symbols = symbols.split('\n')
+
+            exchange_settings = utils.get_exchange_settings(exchange_name)
+            exchange = utils.get_ccxt_exchange(exchange_name, exchange_settings)
 
             asyncio.ensure_future(utils.subscribe_ws('ob', exchange, symbols, limit,
-                                                     loop, pp, args.debug, args.verbose))
+                                                     loop, pp, args.debug, args.verbose, session))
 
         loop.run_forever()
 

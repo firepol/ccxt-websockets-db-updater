@@ -9,9 +9,7 @@ When the branch will be forked in the [official CCXT project](https://github.com
 
 Credits for the websockets implementations: **lfern** and his collaborators.
 
-If you are looking for a java alternative, check my other similar project: [Cryptows](https://github.com/firepol/crypto-websockets).
-
-The database saving part is work in progress, but to get an idea how it will work, check _Cryptows_. I will use SQLAlchemy ORM in order to support several databases.
+If you are looking for an alternative in Java, check my other similar project: [Cryptows](https://github.com/firepol/crypto-websockets).
 
 ## Installation
 
@@ -48,7 +46,7 @@ To get the latest updates from https://github.com/firepol/ccxt-websockets, first
 pip uninstall ccxt
 ```
 
-Get the latest version linked in the requirements.txt:
+Get the latest version linked in the `requirements.txt`:
 
 ```
 pip install -r requirements
@@ -56,7 +54,7 @@ pip install -r requirements
 
 ## Quick start
 
-**Note**: the python commands may not work for you, if you type them like an executable file, especially if you are on Windows. In that case prefix the command with `python`, like this:
+**Note**: If you are using Windows the python commands written in this document may not work for you. In that case just call the command prefixed with `python`, like this:
 
 ```
 python script_name.py
@@ -75,13 +73,41 @@ Then test the BTC/USDT websocket connection to [binance](https://www.binance.com
 ./ob_tester.py -e binance -s ETH/BTC --verbose
 ```
 
-## Database updater usage
+## Configuration
 
-**This is still work in progress: for now nothing is saved into a database, yet.**
+First of all, copy `samples/settings.ini` to `data/settings.ini`.
 
-To configure the exchanges and pairs you want to fetch, copy the `samples/settings_ws.json` file to the `data` folder and edit it.
+`[config]`: this is the main configuration section.
 
-Some exchanges (like cex.io) need to be authenticated via api key / secret. To configure your api keys, copy the `samples/settingss.json` file to the `data` folder and edit it. Each exchange value should be an array of pairs, uppercase, e.g. `"bitstamp": ["BTC/EUR", "BTC/USD"]`.
+`db_url`: database connection string.
+
+Examples:
+- PostgreSQL: `postgres://postgres:postgres@localhost:5432/cryptows`
+- SQLite: `sqlite:///cryptows.db`
+
+`order_book_entries`: (by default: `5`) limit of order books to fetch (5 means 5 bids and 5 asks).
+
+Exchanges and pairs you want to fetch:in square brackets write the exchange name, in the following line insert a list of symbols, as follows:
+
+```
+[bitstamp]
+symbols: ETH/BTC
+         BTC/USD
+         ETH/USD
+```
+
+You can comment (with ";" at the beginning of the line) sections and single lines, e.g.:
+
+```
+[bitstamp]
+symbols: ETH/BTC
+;         BTC/USD
+         ETH/USD
+```
+
+Some exchanges (like cex.io) need to be authenticated via api key / secret. Add your api keys in the `data/exchange_api_keys.json` file (you find a template in the samples folder).
+
+## Usage
 
 The usage of the websocket database updater is quite straightforward:
 
@@ -89,14 +115,14 @@ The usage of the websocket database updater is quite straightforward:
 ./ob_updater.py
 ``` 
 
-The program checks the exchanges configured in the `data/settings_ws.json` file and create a websocket connection for each pair.
+The program checks the exchanges configured in the `data/settings.ini` file and creates a websocket connection for each pair.
 
-Add `--debug` to see when an order book update occurs;  
+Add `--debug` to see when an order book update occurs.  
 Add `--verbose` to see the order book update values.
 
 ## Donations / support
 
-**I won't ask donations, but I will share my referral links** to a few echanges and bots I tested and that I can recommend, thank you for registering using my links:
+**I won't ask donations, but I'm sharing a few referral links** for echanges and bots I tested and that I can recommend. Thank you for registering to these services using my links:
 
 [coinbase](https://www.coinbase.com/join/596c62efa795880085a1a1a7) this is where I started. A must have exchange where you should NOT trade if you are a noob ;) Instead, after making your first deposit, trade via [Coinbase Pro](https://pro.coinbase.com) using a limit order: like that you will pay **0% fees** on the trade, which is quite awesome. Coinbase Pro is funded via coinbase accounts and needs a coinbase account to login.
 

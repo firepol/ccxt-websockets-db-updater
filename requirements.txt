@@ -1,1 +1,5 @@
 git+git://github.com/firepol/ccxt-websockets#egg=ccxt&subdirectory=python
+SQLAlchemy
+python-dateutil
+psycopg2-binary
+ConfigParser
