@@ -3,11 +3,16 @@
 
 import argparse
 import asyncio
+import logging
 import pprint
 import configparser
 
 import utils
 from db_model import get_db_session
+from ws_exception import WsError
+
+FORMAT = "[%(asctime)s, %(levelname)s] %(message)s"
+logging.basicConfig(filename='websockets.log', level=logging.INFO, format=FORMAT)
 
 
 def main():
@@ -26,6 +31,8 @@ def main():
 
     session = get_db_session()
 
+    ob_subscriptions = {}
+
     try:
         sections_to_ignore = ['config']
         for exchange_name in settings.sections():
@@ -39,18 +46,26 @@ def main():
             exchange_settings = utils.get_exchange_settings(exchange_name)
             exchange = utils.get_ccxt_exchange(exchange_name, exchange_settings)
 
-            asyncio.ensure_future(utils.subscribe_ws('ob', exchange, symbols, limit,
-                                                     loop, pp, args.debug, args.verbose, session))
+            # make a list of tasks by exchange id
+            ob_subscriptions[exchange.id] = asyncio.ensure_future(utils.subscribe_ws('ob', exchange, symbols, limit,
+                                                     pp, args.debug, args.verbose, session))
 
         loop.run_forever()
 
+    except WsError as wse:
+        print(f'Canceling: {wse}')
+        ob_subscriptions[wse].cancel()
     except KeyboardInterrupt:
+        message = 'Keyboard interrupt. Stopped.'
+        print(message)
+        logging.info(message)
         pass
     finally:
-        print("Closing Loop")
+        print('Closing Loop')
         loop.close()
+        session.close()
 
-    print("After complete")
+    print('ob_updater stopped.')
 
 
 if __name__ == '__main__':

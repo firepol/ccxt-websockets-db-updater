@@ -3,15 +3,21 @@ import logging
 import re
 import sys
 import traceback
+import datetime
 
 import ccxt.async_support as ccxt
 
 import book_utils
 
 # exchanges that in CCXT must be instantiated with a class ending with "2"
+from ws_exception import WsError
+
 EXCHANGES_API_V2 = ['hitbtc', 'bitfinex']
 # CCXT ids of exchanges using USDT instead of USD
 USDT_EXCHANGE_IDS = ['binance', 'bitfinex2']
+
+FORMAT = "[%(asctime)s, %(levelname)s] %(message)s"
+logging.basicConfig(filename='websockets.log', level=logging.INFO, format=FORMAT)
 
 
 def get_exchange_settings(exchange_name):
@@ -45,13 +51,16 @@ def get_ccxt_exchange(exchange_name, settings, **kwargs):
         logging.warning(f'Exchange {exchange_name} not supported, ignoring...')
 
 
-async def subscribe_ws(event, exchange, symbols, limit, loop, pp, debug=False, verbose=False, session=None):
+async def subscribe_ws(event, exchange, symbols, limit, pp, debug=False, verbose=False, session=None):
     @exchange.on('err')
-    def websocket_error(err, conxid):  # pylint: disable=W0612
-        print(type(err).__name__ + ":" + str(err))
-        traceback.print_tb(err.__traceback__)
-        traceback.print_stack()
-        loop.stop()
+    async def websocket_error(err, conxid):  # pylint: disable=W0612
+        error_message = type(err).__name__ + ":" + str(err)
+        error_stack = traceback.extract_stack()
+        logging.error(f'{exchange.id}: {error_message}')
+        logging.error(error_stack)
+        print(f'{exchange.id}, {datetime.datetime.now()}, {error_stack}')
+        await exchange.close()
+        raise WsError(exchange.id)
 
     @exchange.on(event)
     def websocket_ob(symbol, data):  # pylint: disable=W0612
@@ -83,6 +92,7 @@ async def subscribe_ws(event, exchange, symbols, limit, loop, pp, debug=False, v
         symbol = fix_symbol(exchange.id, symbol)
         await exchange.websocket_subscribe(event, symbol, {'limit': limit})
         print(f'subscribed: {exchange.id} {symbol}')
+        logging.info(f'subscribed: {exchange.id} {symbol}')
 
 
 def get_currency(symbol, position=1):
@@ -93,9 +103,13 @@ def get_currency(symbol, position=1):
 
 
 def fix_symbol(exchange_id, symbol):
-    """Fix (to UPPERCASE & "/" delimiter) quickly typed symbols, e.g. btc-usd -> BTC/USD"""
+    """
+    Fix (to UPPERCASE & "/" delimiter) quickly typed symbols, and exchanges using stable coins instead of fiat
+    e.g. btc-usd -> BTC/USD, btc/eur -> BTC/EURT
+    """
     result = symbol.upper().replace('-', '/')
     # Replace USD with USDT
-    if exchange_id in USDT_EXCHANGE_IDS and result.endswith('/USD'):
+    if exchange_id in USDT_EXCHANGE_IDS and (result.endswith('/USD' or result.endswith('/EUR'))):
         result = result.replace('/USD', '/USDT')
+        result = result.replace('/EUR', '/EURT')
     return result

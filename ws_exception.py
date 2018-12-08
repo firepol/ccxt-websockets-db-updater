@@ -1,0 +1,2 @@
+class WsError(Exception):
+    pass

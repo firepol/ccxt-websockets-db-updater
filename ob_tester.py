@@ -30,7 +30,7 @@ def main():
 
     try:
         asyncio.ensure_future(utils.subscribe_ws(args.event, exchange, args.symbol, args.limit,
-                                                 loop, pp, args.debug, args.verbose))
+                                                 pp, args.debug, args.verbose))
         loop.run_forever()
     except KeyboardInterrupt:
         pass
