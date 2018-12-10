@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 import dateutil.parser
 
@@ -32,17 +33,26 @@ def insert_order_books(session, order_books, exchange, base, quote, side, ob_dat
         session.add(db_ob)
 
 
+def is_datetime_acceptable(ob_datetime, tolerated_seconds):
+    """Returns true, if the datetime is recent enough (tolerated_seconds), false if it isn't"""
+    tz_info = ob_datetime.tzinfo
+    # Some OBs may come with the wrong datetime, let's check it and fix it if necessary
+    # https://stackoverflow.com/questions/796008/cant-subtract-offset-naive-and-offset-aware-datetimes
+    datetime_tolerated = datetime.datetime.now(tz=tz_info) - datetime.timedelta(seconds=tolerated_seconds)
+
+    if ob_datetime < datetime_tolerated:
+        return False
+    return True
+
+
 def insert_or_update(session, asks, bids, exchange, symbol, ob_datetime=None):
     if ob_datetime:
         ob_datetime = dateutil.parser.parse(ob_datetime)
-        tz_info = ob_datetime.tzinfo
-        # Some OBs may come with the wrong datetime, let's check it and fix it if necessary
-        # https://stackoverflow.com/questions/796008/cant-subtract-offset-naive-and-offset-aware-datetimes
-        datetime_tolerated = datetime.datetime.now(tz=tz_info) - datetime.timedelta(minutes=5)
 
-        if ob_datetime < datetime_tolerated:
+        if not is_datetime_acceptable(ob_datetime, 60):
+            # TODO: to avoid log spam, uncomment this only when you want to debug wrong datetimes
+            # logging.warning(f'{exchange} {symbol} outdated datetime: {ob_datetime}')
             ob_datetime = datetime.datetime.now()
-
     else:
         ob_datetime = datetime.datetime.now()
 
