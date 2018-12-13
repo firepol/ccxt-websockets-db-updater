@@ -6,6 +6,7 @@ import traceback
 import datetime
 
 import ccxt.async_support as ccxt
+import dateutil
 
 import book_utils
 
@@ -51,6 +52,46 @@ def get_ccxt_exchange(exchange_name, settings, **kwargs):
         logging.warning(f'Exchange {exchange_name} not supported, ignoring...')
 
 
+def name_to_num(name):
+    name_sum = sum(ord(character) - 96 for character in name.lower() if character != " ")
+    if name_sum > 9:
+        return int(name_sum / 10)
+    return name_sum
+
+
+def allow_continue(exchange_id, ob_datetime):
+    # This is a temporary workaround to skip OBs based on the decimal of second of the actual time
+    # The goal is to minimize DB writes, because some exchanges like bitfinex flood the system...
+
+    if exchange_id == 'bitstamp':
+        return True
+
+    # TODO: ideally save only if an update is newer than e.g. 0.1s
+    # Create a dictionary exchange -> pair -> last update (datetime) and compare to that
+    ob_datetime_object = dateutil.parser.parse(ob_datetime, ignoretz=True)
+    ob_microsecond = ob_datetime_object.microsecond
+    ds = int(str(ob_microsecond)[0])
+
+    if exchange_id in ['cex', 'bitfinex2', 'binance']:
+        if exchange_id == 'cex':
+            if ds % 3 == 0:
+                return True
+
+        if exchange_id == 'bitfinex2':
+            if (ds + 1) % 3 == 0:
+                return True
+
+        if exchange_id == 'binance':
+            if (ds + 2) % 3 == 0:
+                return True
+    else:
+        name_num = name_to_num(exchange_id)
+        if name_num % ds == 0:
+            return True
+
+    return False
+
+
 async def subscribe_ws(event, exchange, symbols, limit, pp, debug=False, verbose=False, session=None):
     @exchange.on('err')
     async def websocket_error(err, conxid):  # pylint: disable=W0612
@@ -64,7 +105,10 @@ async def subscribe_ws(event, exchange, symbols, limit, pp, debug=False, verbose
 
     @exchange.on(event)
     def websocket_ob(symbol, data):  # pylint: disable=W0612
-        ob_datetime = data.get('datetime')
+        ob_datetime = data.get('datetime') or str(datetime.datetime.now())
+
+        if not allow_continue(exchange.id, ob_datetime):
+            return
 
         if debug:
             # printing just 1 ask & 1 bid
