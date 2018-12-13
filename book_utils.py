@@ -46,8 +46,8 @@ def is_datetime_acceptable(ob_datetime, tolerated_seconds):
 
 
 def insert_or_update(session, asks, bids, exchange, symbol, ob_datetime=None):
-    if ob_datetime:
-        ob_datetime = dateutil.parser.parse(ob_datetime)
+    if ob_datetime:  # Example: '2018-12-13T19:49:42.000Z'
+        ob_datetime = dateutil.parser.parse(ob_datetime, ignoretz=True)
 
         if not is_datetime_acceptable(ob_datetime, 60):
             # TODO: to avoid log spam, uncomment this only when you want to debug wrong datetimes
