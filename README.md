@@ -49,7 +49,7 @@ pip uninstall ccxt
 Get the latest version linked in the `requirements.txt`:
 
 ```
-pip install -r requirements
+pip install -r requirements.txt
 ```
 
 ## Quick start
