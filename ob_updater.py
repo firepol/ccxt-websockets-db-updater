@@ -6,7 +6,9 @@ import asyncio
 import logging
 import pprint
 import configparser
+from multiprocessing import Manager
 
+import book_utils
 import utils
 from db_model import get_db_session
 from ws_exception import WsError
@@ -29,9 +31,8 @@ def main():
 
     limit = int(settings['config']['order_book_entries_limit'])
 
-    session = get_db_session()
-
     ob_subscriptions = {}
+    order_books = {}
 
     try:
         sections_to_ignore = ['config']
@@ -39,16 +40,23 @@ def main():
             if exchange_name in sections_to_ignore:
                 continue
 
+            order_books[exchange_name] = {}
+
             symbols = settings[exchange_name].get('symbols')
             if symbols:
                 symbols = symbols.split('\n')
+
+                for symbol in symbols:
+                    order_books[exchange_name][symbol] = {}
 
             exchange_settings = utils.get_exchange_settings(exchange_name)
             exchange = utils.get_ccxt_exchange(exchange_name, exchange_settings)
 
             # make a list of tasks by exchange id
-            ob_subscriptions[exchange.id] = asyncio.ensure_future(utils.subscribe_ws('ob', exchange, symbols, limit,
-                                                     pp, args.debug, args.verbose, session))
+            ob_subscriptions[exchange.id] = asyncio.ensure_future(utils.subscribe_ws('ob', exchange, symbols,
+                                            order_books, limit, pp, args.debug, args.verbose))
+
+        asyncio.ensure_future(process_order_books(order_books))
 
         loop.run_forever()
 
@@ -63,9 +71,25 @@ def main():
     finally:
         print('Closing Loop')
         loop.close()
-        session.close()
 
     print('ob_updater stopped.')
+
+
+async def process_order_books(order_books):
+    """This works as a buffer: order_books are saved to the DB every 0.1s"""
+    session = get_db_session()
+    while True:
+        await asyncio.sleep(0.1)
+        for exchange_name, symbols in order_books.items():
+            print(f'{exchange_name}: {symbols}')
+            for symbol, values in symbols.items():
+                try:
+                    if not values:
+                        continue
+                    book_utils.insert_or_update(session, values.get('asks'), values.get('bids'),
+                                                exchange_name, symbol, values.get('datetime'))
+                except Exception as e:
+                    print(e)
 
 
 if __name__ == '__main__':

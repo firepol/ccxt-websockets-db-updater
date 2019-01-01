@@ -51,20 +51,20 @@ def get_ccxt_exchange(exchange_name, settings, **kwargs):
         logging.warning(f'Exchange {exchange_name} not supported, ignoring...')
 
 
-async def subscribe_ws(event, exchange, symbols, limit, pp, debug=False, verbose=False, session=None):
+async def subscribe_ws(event, exchange, symbols, order_books, limit, pp, debug=False, verbose=False):
     @exchange.on('err')
     async def websocket_error(err, conxid):  # pylint: disable=W0612
         error_message = type(err).__name__ + ":" + str(err)
         error_stack = traceback.extract_stack()
         logging.error(f'{exchange.id}: {error_message}')
         logging.error(error_stack)
-        print(f'{exchange.id}, {datetime.datetime.now()}, {error_stack}')
+        # print(f'{exchange.id}, {datetime.datetime.now()}, {error_stack}')
         await exchange.close()
         raise WsError(exchange.id)
 
     @exchange.on(event)
     def websocket_ob(symbol, data):  # pylint: disable=W0612
-        ob_datetime = data.get('datetime')
+        ob_datetime = data.get('datetime') or str(datetime.datetime.now())
 
         if debug:
             # printing just 1 ask & 1 bid
@@ -74,17 +74,16 @@ async def subscribe_ws(event, exchange, symbols, limit, pp, debug=False, verbose
             pp.pprint(data)
         sys.stdout.flush()
 
-        if session:
-            # Get rid of the surplus order book entries and respect the chosen limit
-            asks = data['asks'][:limit]
-            bids = data['bids'][:limit]
+        # Get rid of the surplus order book entries and respect the chosen limit
+        asks = data['asks'][:limit]
+        bids = data['bids'][:limit]
 
-            # TODO: check if there are exchanges ending with 2 & in that case don't truncate the last character
-            exchange_name = exchange.id
-            if exchange.id.endswith('2'):
-                exchange_name = exchange.id[:-1]
+        # TODO: check if there are exchanges ending with 2 & in that case don't truncate the last character
+        exchange_name = exchange.id
+        if exchange.id.endswith('2'):
+            exchange_name = exchange.id[:-1]
 
-            book_utils.insert_or_update(session, asks, bids, exchange_name, symbol, ob_datetime)
+        order_books[exchange_name][symbol] = {'asks': asks, 'bids': bids, 'datetime': ob_datetime}
 
     sys.stdout.flush()
 
