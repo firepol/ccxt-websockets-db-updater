@@ -6,7 +6,6 @@ import asyncio
 import logging
 import pprint
 import configparser
-from multiprocessing import Manager
 
 import book_utils
 import utils
@@ -81,7 +80,7 @@ async def process_order_books(order_books):
     while True:
         await asyncio.sleep(0.1)
         for exchange_name, symbols in order_books.items():
-            print(f'{exchange_name}: {symbols}')
+            # print(f'{exchange_name}: {symbols}')
             for symbol, values in symbols.items():
                 try:
                     if not values:
