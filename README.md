@@ -119,6 +119,7 @@ The program checks the exchanges configured in the `data/settings.ini` file and 
 
 Add `--debug` to see when an order book update occurs.  
 Add `--verbose` to see the order book update values.
+Add `--reset_db` to delete all records in the `order_book` table before subscribing the websockets.
 
 ## Donations / support
 

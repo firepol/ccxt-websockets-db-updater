@@ -18,6 +18,7 @@ logging.basicConfig(filename='websockets.log', level=logging.INFO, format=FORMAT
 
 def main():
     parser = argparse.ArgumentParser(description='Order books updater')
+    parser.add_argument('--reset_db', help='Delete order_book DB records before starting', action="store_true")
     parser.add_argument('--debug', help='Show when an order book update occurs', action="store_true")
     parser.add_argument('--verbose', help='Show the order book values', action="store_true")
     args = parser.parse_args()
@@ -32,6 +33,9 @@ def main():
 
     ob_subscriptions = {}
     order_books = {}
+
+    if args.reset_db:
+        book_utils.truncate_table('order_book')
 
     try:
         sections_to_ignore = ['config']

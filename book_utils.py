@@ -4,7 +4,7 @@ import logging
 import dateutil.parser
 
 import utils
-from db_model import OrderBook
+from db_model import OrderBook, get_db_session
 
 
 def get_db_order_books(session, exchange, base, quote, side):
@@ -74,3 +74,10 @@ def _insert_or_update(session, orders, exchange, base, quote, side, ob_datetime)
         update_db_records_properties(db_records, orders, ob_datetime)
     if len(db_records) == 0:
         insert_order_books(session, orders, exchange, base, quote, side, ob_datetime)
+
+
+def truncate_table(table_name):
+    session = get_db_session()
+    session.execute(f'TRUNCATE TABLE {table_name}')
+    session.commit()
+    session.close()
