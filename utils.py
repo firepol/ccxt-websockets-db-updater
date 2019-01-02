@@ -14,7 +14,7 @@ from ws_exception import WsError
 
 EXCHANGES_API_V2 = ['hitbtc', 'bitfinex']
 # CCXT ids of exchanges using USDT instead of USD
-USDT_EXCHANGE_IDS = ['binance', 'bitfinex2']
+USDT_EXCHANGE_IDS = ['binance']
 
 FORMAT = "[%(asctime)s, %(levelname)s] %(message)s"
 logging.basicConfig(filename='websockets.log', level=logging.INFO, format=FORMAT)
