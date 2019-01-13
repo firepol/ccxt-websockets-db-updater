@@ -127,18 +127,20 @@ Add `--reset_db` to delete all records in the `order_book` table before subscrib
 
 [coinbase](https://www.coinbase.com/join/596c62efa795880085a1a1a7) this is where I started. A must have exchange where you should NOT trade if you are a noob ;) Instead, after making your first deposit, trade via [Coinbase Pro](https://pro.coinbase.com) using a limit order: like that you will pay **0% fees** on the trade, which is quite awesome. Coinbase Pro is funded via coinbase accounts and needs a coinbase account to login.
 
-[cex.io](https://cex.io/r/0/up113994371/0/) despite the funny name and simple website design, this is a solid exchange which has a killer feature I like a lot, the ability to withdraw money on your credit card.
+[binance](https://www.binance.com/?ref=15877893) is maybe the most popular crypto exchange, if you don't have an account yet, register immediately, you don't even need to go through the KYC (know your customer) procedure to start trading here. Be sure to buy some BNB (binance coin) and adjust the settings to use BNB to pay less fees.
 
-[BitMEX](https://www.bitmex.com/register/CceysA) this is a famous cryptocurrency exchange where you can do margin trading up to 100x. You can double your portfolio or make huge gains with a few trades, or lose it all. Learn what is the liquidation price meaning and use a low leverage or no leverage at all to begin.
+[cex.io](https://cex.io/r/0/up113994371/0/) despite the funny name and simple website design, this is a solid exchange which has a killer feature I like a lot, the ability to withdraw money on Visa and MasterCard credit cards.
 
-[3commas.io](https://3commas.io/?c=tc69129) you don't need to apply for a monthly subscribtion, you can use it on the go, which means you'll pay a commission on your profits (you need to prepay this before using the bot, but the bot is free to try for 3 days, so you get an idea). Worth to give it a try.
+[BitMEX](https://www.bitmex.com/register/CceysA) this is a famous cryptocurrency exchange where you can do margin trading up to 100x. You can double your portfolio or make huge gains with a few trades, or lose it all. Learn what is the liquidation price meaning and use a low leverage or no leverage at all to begin. If you use 10x leverage, you will make 10% profits on a 1% change. This can be very risky, so be sure (by watching bitmex & leverage tutorials etc.) to know what you are doing. I don't recommend using more than 2x leverage at the beginning (once you are experienced you can increase it).
+
+[3commas.io](https://3commas.io/?c=tc69129) you don't need to apply for a monthly subscription, you can use it on the go, which means you'll pay a commission on your profits (you need to prepay this before using the bot, but the bot is free to try for 3 days, so you get an idea). Worth to give it a try.
 
 [ARBITRAGING](https://www.arbitraging.co/platform/register/affiliate/02C6WRhI) website offers an interesting product called **aBOT**, designed for **long term investments** (if you want to try it just for 1-2 months and then take out all your investments, you can do that, but you will probably lose money). aBOT has a stop price, research what that means before investing.  
 The minimum amount to invest is 250 USD (in ETH). If this is too much for you, don't try aBOT. Else it's quite a good platform for passive income: invest and forget about it, you can automatically re-invest 0, 25%, 50%, 75% or 100% of the daily profits (in ARB) or keep the ARB tokens for later.  
 What I do is to keep the ARB tokens and I trade them weekly against ETH.  
 What I suggest to get started is to deposit some ETH, trade them to get some ARB tokens, then trade the ARBs for ETH (try to sell always at a higher price), like this you may actually make some profits with some test trades, as the spread between buy & sell often can be 5% or more. Then do a test withdrawal. Like this you get a feeling how it woks to get the money out of the platform.
 
-**Disclaimer**: I'm no financial advisor, do your own research before using any of the bots, exchanges or investing platforms linked above, or using my tools. I won't be held responsible for any of your losses.
+**Disclaimer**: I'm no financial advisor, do your own research before using any of the services linked above, or using my tools. I won't be held responsible for any of your losses.
 
 ## License
 
