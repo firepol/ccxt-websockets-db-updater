@@ -5,6 +5,7 @@ import argparse
 import pprint
 import asyncio
 
+import ob_updater
 import utils
 
 
@@ -29,8 +30,8 @@ def main():
     exchange = utils.get_ccxt_exchange(args.exchange, settings)
 
     try:
-        asyncio.ensure_future(utils.subscribe_ws(args.event, exchange, args.symbol, args.limit,
-                                                 pp, args.debug, args.verbose))
+        asyncio.ensure_future(ob_updater.subscribe_ws(args.event, exchange, args.symbol, args.limit,
+                                                      pp, args.debug, args.verbose))
         loop.run_forever()
     except KeyboardInterrupt:
         pass

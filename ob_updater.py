@@ -3,13 +3,17 @@
 
 import argparse
 import asyncio
+import datetime
 import logging
 import pprint
 import configparser
+import sys
+import traceback
 
 import book_utils
 import utils
 from db_model import get_db_session
+from utils import fix_symbol
 from ws_exception import WsError
 
 FORMAT = "[%(asctime)s, %(levelname)s] %(message)s"
@@ -56,8 +60,8 @@ def main():
             exchange = utils.get_ccxt_exchange(exchange_name, exchange_settings)
 
             # make a list of tasks by exchange id
-            ob_subscriptions[exchange.id] = asyncio.ensure_future(utils.subscribe_ws('ob', exchange, symbols,
-                                            order_books, limit, pp, args.debug, args.verbose))
+            ob_subscriptions[exchange.id] = asyncio.ensure_future(subscribe_ws('ob', exchange, symbols,
+                                                                               order_books, limit, pp, args.debug, args.verbose))
 
         asyncio.ensure_future(process_order_books(order_books))
 
@@ -76,6 +80,49 @@ def main():
         loop.close()
 
     print('ob_updater stopped.')
+
+
+async def subscribe_ws(event, exchange, symbols, order_books, limit, pp, debug=False, verbose=False):
+    @exchange.on('err')
+    async def websocket_error(err, conxid):  # pylint: disable=W0612
+        error_message = type(err).__name__ + ":" + str(err)
+        error_stack = traceback.extract_stack()
+        logging.error(f'{exchange.id}: {error_message}')
+        logging.error(error_stack)
+        # print(f'{exchange.id}, {datetime.datetime.now()}, {error_stack}')
+        await exchange.close()
+        raise WsError(exchange.id)
+
+    @exchange.on(event)
+    def websocket_ob(symbol, data):  # pylint: disable=W0612
+        ob_datetime = data.get('datetime') or str(datetime.datetime.now())
+
+        if debug:
+            # printing just 1 ask & 1 bid
+            print(f"{event} {exchange.id} {symbol}, {ob_datetime}: ask {data['asks'][0]}; bid: {data['bids'][0]}")
+        if verbose:
+            print(f"{event} {exchange.id} {symbol}:")
+            pp.pprint(data)
+        sys.stdout.flush()
+
+        # Get rid of the surplus order book entries and respect the chosen limit
+        asks = data['asks'][:limit]
+        bids = data['bids'][:limit]
+
+        # TODO: check if there are exchanges ending with 2 & in that case don't truncate the last character
+        exchange_name = exchange.id
+        if exchange.id.endswith('2'):
+            exchange_name = exchange.id[:-1]
+
+        order_books[exchange_name][symbol] = {'asks': asks, 'bids': bids, 'datetime': ob_datetime}
+
+    sys.stdout.flush()
+
+    for symbol in symbols:
+        symbol = fix_symbol(exchange.id, symbol)
+        await exchange.websocket_subscribe(event, symbol, {'limit': limit})
+        print(f'subscribed: {exchange.id} {symbol}')
+        logging.info(f'subscribed: {exchange.id} {symbol}')
 
 
 async def process_order_books(order_books):
