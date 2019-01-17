@@ -19,7 +19,7 @@ def get_exchange_settings(exchange_name):
     file_path = './data/exchange_api_keys.json'
     try:
         settings_root = json.load(open(file_path))
-        settings = settings_root[exchange_name]
+        settings = settings_root.get(exchange_name, {})
     except FileNotFoundError:
         print(f'Could not find {file_path}')
         pass
