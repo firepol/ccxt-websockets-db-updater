@@ -18,6 +18,7 @@ from ws_exception import WsError
 
 FORMAT = "[%(asctime)s, %(levelname)s] %(message)s"
 logging.basicConfig(filename='websockets.log', level=logging.INFO, format=FORMAT)
+pp = pprint.PrettyPrinter(depth=6)
 
 
 def main():
@@ -27,7 +28,6 @@ def main():
     parser.add_argument('--verbose', help='Show the order book values', action="store_true")
     args = parser.parse_args()
 
-    pp = pprint.PrettyPrinter(depth=6)
     loop = asyncio.get_event_loop()
 
     settings = configparser.ConfigParser()
@@ -39,7 +39,10 @@ def main():
     order_books = {}
 
     if args.reset_db:
-        book_utils.truncate_table('order_book')
+        try:
+            book_utils.truncate_table('order_book')
+        except:
+            pass
 
     try:
         sections_to_ignore = ['config']
@@ -60,8 +63,8 @@ def main():
             exchange = utils.get_ccxt_exchange(exchange_name, exchange_settings)
 
             # make a list of tasks by exchange id
-            ob_subscriptions[exchange.id] = asyncio.ensure_future(subscribe_ws('ob', exchange, symbols,
-                                                                               order_books, limit, pp, args.debug, args.verbose))
+            ob_subscriptions[exchange.id] = asyncio.ensure_future(subscribe_ws('ob', exchange, symbols, limit,
+                                                                               args.debug, args.verbose, order_books))
 
         asyncio.ensure_future(process_order_books(order_books))
 
@@ -82,7 +85,19 @@ def main():
     print('ob_updater stopped.')
 
 
-async def subscribe_ws(event, exchange, symbols, order_books, limit, pp, debug=False, verbose=False):
+async def subscribe_ws(event, exchange, symbols, limit, debug=False, verbose=False, order_books=None):
+    """
+    Subscribe websockets channels of many symbols in the same exchange
+
+    :param event: 'ob' for orderbook updates, 'ticker' for ticker, 'trade' for trades, refer to CCXT WS documentation
+    :param exchange: CCXT exchange instance
+    :param symbols: list of symbols e.g. ['btc/usd', 'trx/btc']
+    :param limit: order books limit, e.g. 1 for just the best price, 5 for the 5 best prices etc.
+    :param debug: if "True", prints 1 ask and 1 bid
+    :param verbose: if "True", prints the order books using pretty print
+    :param order_books: "buffer" dictionary containing the order books (it is used to update the DB)
+    :return:
+    """
     @exchange.on('err')
     async def websocket_error(err, conxid):  # pylint: disable=W0612
         error_stack = traceback.extract_stack()
@@ -110,7 +125,8 @@ async def subscribe_ws(event, exchange, symbols, order_books, limit, pp, debug=F
         if exchange.id.endswith('2'):
             exchange_name = exchange.id[:-1]
 
-        order_books[exchange_name][symbol] = {'asks': asks, 'bids': bids, 'datetime': ob_datetime}
+        if order_books:
+            order_books[exchange_name][symbol] = {'asks': asks, 'bids': bids, 'datetime': ob_datetime}
 
     sys.stdout.flush()
 

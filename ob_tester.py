@@ -23,7 +23,6 @@ def main():
         print('You must specify at least one symbol with the `-s` parameter, e.g.: -s BTC/USD')
         return
 
-    pp = pprint.PrettyPrinter(depth=6)
     loop = asyncio.get_event_loop()
 
     settings = utils.get_exchange_settings(args.exchange)
@@ -31,7 +30,7 @@ def main():
 
     try:
         asyncio.ensure_future(ob_updater.subscribe_ws(args.event, exchange, args.symbol, args.limit,
-                                                      pp, args.debug, args.verbose))
+                                                      args.debug, args.verbose, None))
         loop.run_forever()
     except KeyboardInterrupt:
         pass
