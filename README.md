@@ -13,42 +13,39 @@ If you are looking for an alternative in Java, check my other similar project: [
 
 ## Installation
 
-Clone this repository:
-
 ```
+# Clone this repository
 git clone https://github.com/firepol/ccxt-websockets-db-updater.git
-```
 
-cd in the repository and create a folder called `data`, this is needed to store exchange settings and websockets you want to subscribe to.
-
-```
+# Enter the repository dir
 cd ccxt-websockets-db-updater
+
+# Create a `data` directory (needed to store exchange settings and websockets you want to subscribe to)
 mkdir data
-```
 
-Create a virtual environment (I called mine _ccxtws_) for this project (e.g. I create all my environments in `~/env`:  
+# Copy the sample settings.ini into data/
+cp samples/settings.ini data/
 
-```
-virtualenv -p /usr/bin/python3.6 ~/env/ccxtws
-```
+# Create a python 3.6 virtual environment
+virtualenv -p /usr/bin/python3.6 env
 
-Then run:  
-
-```
+# Activate the python virtual environment
 source ~/env/ccxtws/bin/activate
+
+# Install all required dependencies
+pip install -r requirements.txt
+
 ```
 
 ## Update
 
-To get the latest updates from https://github.com/firepol/ccxt-websockets, first unintall CCXT as follows:
+To get the latest updates from https://github.com/firepol/ccxt-websockets:
 
 ```
+# Unintall the old version of CCXT
 pip uninstall ccxt
-```
 
-Get the latest version linked in the `requirements.txt`:
-
-```
+# Get all missing dependencies (this will fetch the latest CCXT version linked in requirements.txt)
 pip install -r requirements.txt
 ```
 
@@ -85,7 +82,7 @@ Examples:
 - PostgreSQL: `postgres://postgres:postgres@localhost:5432/cryptows`
 - SQLite: `sqlite:///cryptows.db`
 
-`order_book_entries`: (by default: `5`) limit of order books to fetch (5 means 5 bids and 5 asks).
+`order_book_entries`: (by default: `1`) limit of order books to fetch (e.g. 5 means 5 bids and 5 asks).
 
 Exchanges and pairs you want to fetch:in square brackets write the exchange name, in the following line insert a list of symbols, as follows:
 
