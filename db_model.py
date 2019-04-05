@@ -39,8 +39,13 @@ def get_db_url():
 
 
 # Engine is called each time db_model is imported
-engine = create_engine(get_db_url())
-Base.metadata.create_all(engine)
+try:
+    db_url = get_db_url()
+    engine = create_engine(db_url)
+    Base.metadata.create_all(engine)
+except:
+    # Not raising an exception, as this is used also by ob_tester.py, which doesn't need a DB
+    print('Could not find ./data/settings.ini file')
 
 
 def get_db_session():
