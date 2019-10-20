@@ -9,6 +9,22 @@ This project is based on [CCXT lfern/websockets-multiple fork](https://github.co
 To speed up installation, as the CCXT repository is huge and takes a long time to download, I created a repository containing just the transpiled files from lfern's branch: https://github.com/firepol/ccxt-websockets
 When the branch will be forked in the [official CCXT project](https://github.com/ccxt/ccxt), this temporary branch won't be needed anymore.
 
+**Note:** in the `requirements.txt` file, in the 1st line you see a dependency to the `ccxt-websockets` repository, which could not be up to date. In case you want to update it yourself, you have to
+1. fork the `ccxt-websockets` repository
+1. clone lfern's fork
+1. checkout lfern's `websockets-multiple` branch
+1. build lfern's `websockets-multiple` branch as follows (if you prefer `npm` than `yarn`, adjust the commands accordingly):
+    ```
+    yarn
+    yarn export-exchanges
+    yarn transpile
+    ```
+1. overwrite the `python` folder of the `ccxt-websockets` repository with the one you just updated; do the same with the `package.json` file
+1. commit and push (you must add the remote pointing to your own fork and push there)
+1. change the 1st line of the `requirements.txt` to point to your fork of the `ccxt-websockets` repository
+1. `pip uninstall ccxt`
+1. `pip install -r requirements.txt`
+
 Credits for the websockets implementations: **lfern** and his collaborators.
 
 If you are looking for an alternative in Java, check my other similar project: [Cryptows](https://github.com/firepol/crypto-websockets).
