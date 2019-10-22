@@ -78,6 +78,6 @@ def _insert_or_update(session, orders, exchange, base, quote, side, ob_datetime)
 
 def truncate_table(table_name):
     session = get_db_session()
-    session.execute(f'TRUNCATE TABLE {table_name}')
+    session.execute(f'DELETE FROM {table_name}')
     session.commit()
     session.close()

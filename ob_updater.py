@@ -41,7 +41,8 @@ def main():
     if args.reset_db:
         try:
             book_utils.truncate_table('order_book')
-        except:
+        except Exception as e:
+            print(f'There was an error when trying to DELETE FROM ORDER_BOOK: {e}')
             pass
 
     try:
