@@ -59,7 +59,7 @@ def fix_symbol(exchange_id, symbol):
     """
     result = symbol.upper().replace('-', '/')
     # Replace USD with USDT
-    if exchange_id in USDT_EXCHANGE_IDS and (result.endswith('/USD' or result.endswith('/EUR'))):
+    if exchange_id in USDT_EXCHANGE_IDS and (result.endswith('/USD') or result.endswith('/EUR')):
         result = result.replace('/USD', '/USDT')
         result = result.replace('/EUR', '/EURT')
     return result
